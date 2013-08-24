@@ -17,42 +17,35 @@ angular.module('musicAlbum.services', []).
         }
 
     })
-.factory('album',function(credentials,$http){
+.factory('album',function(credentials,$http,mapper,$q){
      var url=   "http://api.ent.nokia.com/1.x/us/?category=artist&domain=music&client_id=5e1490bd4983b770cfde86f5d77f0a05";
-     var getAlbumData=function(){
+     var getAlbumData=function(result){
+         var deferred = $.Deferred();
          var options={
              url:url,
              dataType: "jsonp",
              type:"GET"
          }
          $.ajax(options).then(function(response){
-             alert("success")
              console.log(response);
+             mapToData(response.data.items,mapper.mapAlbum,result);
+             deferred.resolve(result);
+            // console.log(result);
+
          })
              .fail(function(){
+                 deferred.reject();
                 alert("failed");
              })
-
-      /*  $http({method: 'GET', url: url,dataType:"jsonp"}).
-            success(function(data, status, headers, config) {
-                alert("success")
-                // this callback will be called asynchronously
-                // when the response is available
-            }).
-            error(function(data, status, headers, config) {
-                alert("failed")
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-            });
-            */
-         function call_back(){
-             alert("callback")
-         }
-
+     return deferred;
      }
-        function call_back(){
-            alert("callback")
-        }
+     function mapToData(data,mapFunc,result){
+         alert("here");
+         $.each(data,function(){
+           result.push(mapFunc(this));
+         })
+     }
+
      return{
          getAlbumData:getAlbumData
      }
